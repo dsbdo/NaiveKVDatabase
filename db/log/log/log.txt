@@ -1,0 +1,7 @@
+<1,ABC,>
+<1,222,>
+<2,hhhh,hhhhhh>
+<2,write_log,good>
+<3,key,NULL>
+<3,key,NULL>
+<4,scan,scan>
