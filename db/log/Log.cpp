@@ -4,29 +4,47 @@
 
 namespace lmmdb {
     namespace log {
+
+
         Log::Log() {
             one_log_one_sync_ = false;
+
         }
-        Log::Log(std::string file_path, bool is_sync) {
-            // 判断文件是否存在，假定到时候系统跑的文件夹Log文件夹
-            // 三种类型的Log, 一种是opLog, 另外一种是dumpLog， 第三种是ssTable的log
-            // if((fd_ = open(file_path.c_str(), O_RDWR | O_CREAT | O_TRUNC)) < 0) {
-            //     //文件打开失败处理，后面看看怎么处理
-            //     perror("create new log file fail");
-            // }
-            // if(fd_  > 0) {
-            //     //先设置文件大小, 先简单设置为8M
-            //     if(ftruncate(fd_, 8 * 1024 * 1024) < 0){
-            //         // 错误处理
-            //         perror("set log file size error");
-            //     }
-            //     //这里需要使用mmap 打开文件, 需要判断是否出错
-            //     log_file_ = (lmmdb::globalVar::OpLog*)mmap(NULL, 8 * 1024 * 1024, PROT_WRITE, MAP_PRIVATE, fd_, 0);
-            //     if(log_file_ == MAP_FAILED) {
-            //         perror("mmap failed");
-            //     }
-            // }
+        Log::Log(const Log& temp) {}
+        Log& Log::operator=(const Log& temp) {}
+        
+        //初始化
+        Log* Log::instance = new Log();
+
+        Log* Log::getInstance() {
+            return instance;
         }
+
+        void Log::setSync(bool is_sync) {
+            one_log_one_sync_ = is_sync;
+        }
+
+
+        // Log::Log(std::string file_path, bool is_sync) {
+        //     // 判断文件是否存在，假定到时候系统跑的文件夹Log文件夹
+        //     // 三种类型的Log, 一种是opLog, 另外一种是dumpLog， 第三种是ssTable的log
+        //     // if((fd_ = open(file_path.c_str(), O_RDWR | O_CREAT | O_TRUNC)) < 0) {
+        //     //     //文件打开失败处理，后面看看怎么处理
+        //     //     perror("create new log file fail");
+        //     // }
+        //     // if(fd_  > 0) {
+        //     //     //先设置文件大小, 先简单设置为8M
+        //     //     if(ftruncate(fd_, 8 * 1024 * 1024) < 0){
+        //     //         // 错误处理
+        //     //         perror("set log file size error");
+        //     //     }
+        //     //     //这里需要使用mmap 打开文件, 需要判断是否出错
+        //     //     log_file_ = (lmmdb::globalVar::OpLog*)mmap(NULL, 8 * 1024 * 1024, PROT_WRITE, MAP_PRIVATE, fd_, 0);
+        //     //     if(log_file_ == MAP_FAILED) {
+        //     //         perror("mmap failed");
+        //     //     }
+        //     // }
+        // }
         Log::~Log() {
             log_file_.flush();
             log_file_.close();

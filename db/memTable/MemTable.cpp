@@ -8,11 +8,17 @@ namespace lmmdb {
             raw_map_data_ = new std::map<std::string, std::string>();
             // 现在memTable的大小
             current_table_size_ = 0;
+
         }
         
         MemTable::~MemTable()
         {
             //清除所有数据
+        }
+
+        MemTable* MemTable::instance = new MemTable();
+        MemTable* MemTable::getInstance() {
+            return instance;
         }
 
         bool MemTable::checkPoint() {

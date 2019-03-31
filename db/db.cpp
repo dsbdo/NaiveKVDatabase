@@ -10,10 +10,14 @@
 
 namespace lmmdb {
     namespace db {
+
         class DB
         {
         private:
             /* data */
+            log::Log* log_;
+            memtable::MemTable* memtable_;
+            immutableTable::ImmutableTable* immutable_table_;
         public:
             DB(/* args */);
             ~DB();
@@ -26,13 +30,15 @@ namespace lmmdb {
         
         DB::DB(/* args */)
         {
-
+            log_ = log::Log::getInstance();
+            memtable_ = memtable::MemTable::getInstance();
+            immutable_table_ = immutableTable::ImmutableTable::getInstance();
         }
         
         DB::~DB()
         {
         }
-        
+
         std::string DB::Get(std::string key) {
             std::string temp  = "";
             // 第一步， 从memTable中寻找

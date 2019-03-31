@@ -10,14 +10,17 @@ namespace lmmdb {
             raw_map_data_ = NULL;
         }
         ImmutableTable::ImmutableTable(const ImmutableTable&) {
-
         }
+
         ImmutableTable& ImmutableTable::operator=(const ImmutableTable&) {
         }
+
         ImmutableTable::~ImmutableTable()
         {
         }
+
         ImmutableTable* ImmutableTable::instance = new ImmutableTable();
+        
         // 返回实例
         ImmutableTable* ImmutableTable::getInstance() {
             return instance;
@@ -104,9 +107,8 @@ namespace lmmdb {
                 raw_map_data_ = new_map_data;
                 // 生成新的disk_block, 最好改成多线程处理
                 generateDiskBlock();
-
                 return true;
             }
-        } 
+        }
     }
 }

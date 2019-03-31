@@ -9,7 +9,7 @@ using std::endl;
 using std::cout;
 using std::cin;
 int main(void) {
-    Log* log = new Log();
+    Log* log = Log::getInstance();
 
     if (log->createLog("./log/log.txt", true) ) {
         cout << "log create success" << endl;

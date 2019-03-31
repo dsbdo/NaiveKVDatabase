@@ -11,7 +11,7 @@ namespace lmmdb {
         class MemTable
         {
         public:
-            MemTable(/* args */);
+
             ~MemTable();
             // 检查memTable的大小是否已经达到检查点
             bool checkPoint();
@@ -21,11 +21,15 @@ namespace lmmdb {
 
             // scan 接口 需要考虑返回的数据很大的时候如何处理
             // 暂留
+            static MemTable* getInstance();
         private:
             /* data */
             // 关于数据长度问题，在插入时，写log的时候就进行限制
+            MemTable(/* args */);
+            static MemTable* instance;
             std::map<std::string, std::string>* raw_map_data_;
             int current_table_size_;
+
         };
     }
 }
