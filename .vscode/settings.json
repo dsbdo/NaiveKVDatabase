@@ -31,6 +31,7 @@
         "cinttypes": "cpp",
         "type_traits": "cpp",
         "typeindex": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "map": "cpp"
     }
 }

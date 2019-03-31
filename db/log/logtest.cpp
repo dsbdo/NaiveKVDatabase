@@ -14,7 +14,7 @@ int main(void) {
     if (log->createLog("./log/log.txt", true) ) {
         cout << "log create success" << endl;
         //get log
-        log->writeLog(day, "ABC", "");
+        log->writeLog(1, "ABC", "");
         log->writeLog(Op::GET, "222", "");
         //write log
         log->writeLog(2, "hhhh", "hhhhhh");
