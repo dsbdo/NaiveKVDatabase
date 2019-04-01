@@ -3,12 +3,16 @@
 #include <map>
 #include <string>
 #include <cstring>
+#include <fstream>
+#include <dirent.h>
+#include <iostream>
+#include "../global.h"
+
 namespace lmmdb {
     namespace immutableTable{
         class ImmutableTable
         { 
         public:
-
             ~ImmutableTable();
             static ImmutableTable* getInstance();
             
@@ -31,10 +35,14 @@ namespace lmmdb {
             ImmutableTable& operator=(const ImmutableTable&);
             static ImmutableTable* instance; 
             
-            //数据不可修改，仅可访问
+            // 数据不可修改，仅可访问
             const std::map<std::string, std::string>* raw_map_data_;
-            //当有新的memTable转换为immutable时，遍历创建当前raw_map_data_同时将其dump到本机上
+            // 当有新的memTable转换为immutable时，遍历创建当前raw_map_data_同时将其dump到本机上
             char* disk_block_;
+
+            // 记录文件信息，例如当前是第几级的level, 第几个文件， 一级最多我们先设置为 12个文件
+            // 启动当前程序时就自动进行统计，并生成下一个文件的文件编号
+            
 
         };
 

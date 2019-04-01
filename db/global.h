@@ -2,10 +2,18 @@
 // option log format
 #ifndef GLOBAL_H_
 #define GLOBAL_H_
+#include <string>
+#include <ctime>
 namespace lmmdb
 {
 namespace globalVar
 {
+    //  operator log 前缀
+    extern std::string g_log_path_prefix;
+    // 数据文件的前缀
+    extern std::string g_data_path_prefix;
+
+// 操作枚举量
 enum Op
 {
     GET = 1,
@@ -13,6 +21,15 @@ enum Op
     DELETE = 3,
     SCAN = 4
 };
+// 文件状态
+enum FileStatus {
+    USING = 1,
+    PENDING = 2,
+    COMMIT = 3,
+    DUMP = 4
+};
+
+// 日志格式
 struct OpLog
 {
     //we define one more char for \0
@@ -33,6 +50,10 @@ struct OpLog
         }
     }
 };
+
+//生成日志名的函数,日志使用 状态 + 时间命名
+//extern std::string getNewLogName();
+
 
 } // namespace globalVar
 

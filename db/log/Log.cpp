@@ -8,9 +8,12 @@ namespace lmmdb {
 
         Log::Log() {
             one_log_one_sync_ = false;
+            current_log_file_ = new std::fstream();
+            old_log_file_ = NULL;
 
         }
         Log::Log(const Log& temp) {}
+
         Log& Log::operator=(const Log& temp) {}
         
         //初始化
@@ -24,38 +27,29 @@ namespace lmmdb {
             one_log_one_sync_ = is_sync;
         }
 
-
-        // Log::Log(std::string file_path, bool is_sync) {
-        //     // 判断文件是否存在，假定到时候系统跑的文件夹Log文件夹
-        //     // 三种类型的Log, 一种是opLog, 另外一种是dumpLog， 第三种是ssTable的log
-        //     // if((fd_ = open(file_path.c_str(), O_RDWR | O_CREAT | O_TRUNC)) < 0) {
-        //     //     //文件打开失败处理，后面看看怎么处理
-        //     //     perror("create new log file fail");
-        //     // }
-        //     // if(fd_  > 0) {
-        //     //     //先设置文件大小, 先简单设置为8M
-        //     //     if(ftruncate(fd_, 8 * 1024 * 1024) < 0){
-        //     //         // 错误处理
-        //     //         perror("set log file size error");
-        //     //     }
-        //     //     //这里需要使用mmap 打开文件, 需要判断是否出错
-        //     //     log_file_ = (lmmdb::globalVar::OpLog*)mmap(NULL, 8 * 1024 * 1024, PROT_WRITE, MAP_PRIVATE, fd_, 0);
-        //     //     if(log_file_ == MAP_FAILED) {
-        //     //         perror("mmap failed");
-        //     //     }
-        //     // }
-        // }
         Log::~Log() {
-            log_file_.flush();
-            log_file_.close();
-        }
-        bool Log::createLog(std::string file_path, bool is_sync) {
+            using std::cout;
+            cout << "deconstructor of Log\n";
+            if(current_log_file_ != NULL) {
+                current_log_file_->flush();
+                current_log_file_->close();
+            }
+            if(old_log_file_ != NULL) {
+                old_log_file_->flush();
+                old_log_file_->close();
+            }
 
-            log_file_.open(file_path.c_str(), std::ios::in | std::ios::out | std::ios::trunc);
-            if(log_file_.is_open()) {
+        }
+
+        bool Log::createLog(std::string file_path, bool is_sync) {
+            using lmmdb::globalVar::FileStatus;
+
+            current_log_file_->open(file_path.c_str(), std::ios::in | std::ios::out | std::ios::trunc);
+            if(current_log_file_->is_open()) {
                 // 打开文件成功
                 std::cout << "open log file success\n";
                 one_log_one_sync_ = is_sync;
+                current_file_status_ = FileStatus::USING;
                 return true;
             }
             else {
@@ -79,6 +73,7 @@ namespace lmmdb {
             if(value.empty() || value.size() > 256 ){
                 // value error
             }
+
             // 构造定长log, log 由 3部分组成 op, key， value, 如果key value中出现同样的分隔符如何处理
             std::string temp_log;
             temp_log += "<";
@@ -89,10 +84,10 @@ namespace lmmdb {
             temp_log += value;
             temp_log += ">\n";
             // 添加记录到内存上
-            log_file_.write(temp_log.c_str(), temp_log.size());
+            current_log_file_->write(temp_log.c_str(), temp_log.size());
             
             if(one_log_one_sync_) {
-                if(log_file_.good()) {
+                if(current_log_file_->good()) {
                     return emitPhysicalRecord();
                 }
                 //write fail
@@ -105,12 +100,47 @@ namespace lmmdb {
             }
 
         }
+
+        void Log::changeFileStatus(bool change_current_file, int status, std::string new_log_file_name) {
+            using lmmdb::globalVar::FileStatus;
+            using std::ios;
+
+            if(change_current_file) {
+                // 创建新的文件
+                if(old_file_status_ == FileStatus::DUMP) {
+                    // 老文件已经直接dump到本地了
+                }
+                else {
+                    // 关闭老文件
+                    old_log_file_->close();
+                    delete old_log_file_;
+                    
+                    // 将current log 文件移交到 old log 文件
+                    old_log_file_ = current_log_file_;
+                    old_file_status_ = status;
+                    current_log_file_ = new std::fstream();
+                    current_log_file_->open(new_log_file_name, ios::in | ios::out | ios::trunc);
+                    if(current_log_file_->is_open()) {
+                        // file open success
+                        current_file_status_ = FileStatus::USING;
+                    }
+                    else {
+                        // file open failed
+                    }
+                }
+            }
+            else {
+                // 仅仅修改文件状态
+                old_file_status_ = status;
+            }
+        }
         bool Log::emitPhysicalRecord() {
+
             //提交到物理磁盘上
             //写入流缓冲成功, 刷新到内核缓冲区中去, 是否有将数据存储到磁盘中去，这是个问题，唯一可以保证的是
             //用户缓冲区已经刷新
-            log_file_.flush();
-            if(log_file_.good()) {
+            current_log_file_->flush();
+            if(current_log_file_->good()) {
                 return true;
             }
             else {
