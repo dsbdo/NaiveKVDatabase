@@ -7,6 +7,7 @@
 #include "immutableTable/ImmutableTable.h"
 #include "global.h"
 #include <string>
+#include <unistd.h>
 
 namespace lmmdb
 {
@@ -48,8 +49,10 @@ DB::DB(/* args */)
 
     log_->createLog(g_log_path_prefix + "USING" + getNewLogName(), false);
 
-    memtable_ = memtable::MemTable::getInstance();
     immutable_table_ = immutableTable::ImmutableTable::getInstance();
+    std::cout << "DB get immutable addr: " <<(long)immutable_table_ << std::endl; 
+    memtable_ = memtable::MemTable::getInstance();
+   
 }
 
 DB::~DB()
@@ -121,9 +124,20 @@ int main(void) {
     using lmmdb::db::DB;
     using std::cout;
     using std::endl;
+    using std::string;
+
     DB temp_db;
+    int counter = 0;
     // 因为是key and value 是固定的，memTable 与 log 插入时不修改大小，准备dump到磁盘时才修改大小
-    temp_db.Put("hello", "world");
+    while(true) {
+        sleep(1);
+        temp_db.Put(string("hello")+std::to_string(counter), "world");
+        counter++;
+        if(counter > 50) {
+            break;
+        }
+    }
+
     temp_db.Put("hello", "world");
     temp_db.Put("hello2", "world2");
     cout << "key: hello, value: " << temp_db.Get("hello") << endl;

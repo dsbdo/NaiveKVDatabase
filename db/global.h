@@ -12,6 +12,7 @@ namespace globalVar
     extern std::string g_log_path_prefix;
     // 数据文件的前缀
     extern std::string g_data_path_prefix;
+    const int K_DISK_BLOCK_SIZE = 1024;
 
 // 操作枚举量
 enum Op

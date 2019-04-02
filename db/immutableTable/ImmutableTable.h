@@ -18,6 +18,7 @@ namespace lmmdb {
             
             // 检查看是否有对应的key的值
             std::string getKeyValue(std::string key);
+
             // 将数据dump到磁盘上。
             bool dumpFileToDisk();
 
@@ -35,6 +36,7 @@ namespace lmmdb {
             ImmutableTable& operator=(const ImmutableTable&);
             static ImmutableTable* instance; 
             
+            int test = 0;
             // 数据不可修改，仅可访问
             const std::map<std::string, std::string>* raw_map_data_;
             // 当有新的memTable转换为immutable时，遍历创建当前raw_map_data_同时将其dump到本机上

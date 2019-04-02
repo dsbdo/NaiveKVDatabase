@@ -2,6 +2,8 @@
 #include <string>
 #include <iostream>
 #include <dirent.h>
+#include <map>
+
 using namespace std;
 std::string getNextDataFileName()
 {
@@ -25,9 +27,36 @@ std::string getNextDataFileName()
     closedir(dp);
     return string("level0-") + std::to_string(counter - 1);
 }
-
+class A {
+    public:
+    void func() {
+        cout << "hello world" << endl;
+    }
+    int a;
+};
 int main(void)
 {
-    cout << getNextDataFileName() << endl;
+
+    map<string, string>* result = NULL;
+    if(result == NULL) {
+        cout << "result is null" << endl;
+        cout << reinterpret_cast<long>(result) << endl;
+    }
+    result = nullptr;
+    if(result == nullptr) {
+        cout << "result is nullptr" << endl;
+        cout << reinterpret_cast<long>(result) << endl;
+    }
+    A* obj = NULL;
+    if (obj == NULL) {
+        cout << "obj is NULL" << endl;
+        cout << reinterpret_cast<long>(obj) << endl;
+    }
+    obj == nullptr;
+    if(obj == nullptr) {
+         cout << "obj is nullptr" << endl;
+         cout << reinterpret_cast<long>(obj)<<endl;
+    }
+   // cout << getNextDataFileName() << endl;
     return 0;
 }
